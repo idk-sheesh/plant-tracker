@@ -1,0 +1,12 @@
+#pragma once
+
+#define WIFI_SSID ""
+#define WIFI_PASSWORD ""
+
+// Le cloud reste désactivé tant que l'API, le token appareil et le CA ne sont
+// pas fournis. Ne jamais mettre ces valeurs dans Git ou dans les logs série.
+#define GARDENJOURNAL_CLOUD_ENABLED 0
+#define GARDENJOURNAL_CLOUD_BASE_URL "https://api.example.invalid"
+#define GARDENJOURNAL_CLOUD_DEVICE_ID "dev_replace_with_provisioned_id"
+#define GARDENJOURNAL_CLOUD_DEVICE_TOKEN ""
+#define GARDENJOURNAL_CLOUD_ROOT_CA ""

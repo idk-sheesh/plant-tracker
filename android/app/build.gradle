@@ -1,0 +1,93 @@
+plugins {
+    id "com.android.application"
+    id "org.jetbrains.kotlin.android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("key.properties")
+def releaseTaskRequested = gradle.startParameter.taskNames.any {
+    it.toLowerCase().contains("release")
+}
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
+}
+
+def requiredReleaseSigningKeys = [
+    "storeFile",
+    "storePassword",
+    "keyAlias",
+    "keyPassword"
+]
+def missingReleaseSigningKeys = requiredReleaseSigningKeys.findAll {
+    !keystoreProperties.containsKey(it) || keystoreProperties[it].toString().trim().isEmpty()
+}
+
+if (releaseTaskRequested && !missingReleaseSigningKeys.isEmpty()) {
+    throw new GradleException(
+        "Release signing is not configured. Create android/key.properties from " +
+        "android/signing.template.properties. Missing: ${missingReleaseSigningKeys.join(', ')}"
+    )
+}
+
+android {
+    // Standalone garden journal application.
+    namespace "org.example.gardenjournal"
+    compileSdk flutter.compileSdkVersion
+    ndkVersion flutter.ndkVersion
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled true
+    }
+    kotlinOptions { jvmTarget = '17' }
+    defaultConfig {
+        applicationId "org.example.gardenjournal"
+        minSdkVersion flutter.minSdkVersion
+        targetSdk flutter.targetSdkVersion
+        versionCode flutter.versionCode
+        versionName flutter.versionName
+        multiDexEnabled true
+        manifestPlaceholders = [
+            applicationName: "android.app.Application",
+            usesCleartextTraffic: "false"
+        ]
+    }
+    signingConfigs {
+        release {
+            if (keystorePropertiesFile.exists() && missingReleaseSigningKeys.isEmpty()) {
+                storeFile file(keystoreProperties["storeFile"])
+                storePassword keystoreProperties["storePassword"]
+                keyAlias keystoreProperties["keyAlias"]
+                keyPassword keystoreProperties["keyPassword"]
+            }
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            debuggable false
+            jniDebuggable false
+            manifestPlaceholders = [
+                applicationName: "android.app.Application",
+                usesCleartextTraffic: "false"
+            ]
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            manifestPlaceholders = [
+                applicationName: "android.app.Application",
+                usesCleartextTraffic: "true"
+            ]
+            minifyEnabled false
+            shrinkResources false
+        }
+    }
+}
+flutter { source '../..' }
+dependencies {
+    implementation 'androidx.multidex:multidex:2.0.1'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
+}

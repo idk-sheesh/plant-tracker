@@ -1,0 +1,26 @@
+name: Checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  flutter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: dart format --output=none --set-exit-if-changed lib test integration_test
+      - run: flutter analyze
+      - run: flutter test
+  services:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python tool/check_public_files.py
+      - run: python -m unittest discover -s cloud_api/tests
+      - run: python -m unittest discover -s camera_gateway/tests

@@ -1,0 +1,29 @@
+#pragma once
+
+// Copier vers config.h et renseigner uniquement la copie locale.
+// config.h est exclu de Git.
+#define WIFI_SSID ""
+#define WIFI_PASSWORD ""
+
+#define CAMERA_ID "cam-01"
+#define CAMERA_DEVICE_TOKEN ""
+#define GATEWAY_HOST "camera-gateway.local"
+#define GATEWAY_PORT 8443
+
+// Le Raspberry Pi peut fournir le NTP local. Le second serveur ne doit être
+// joignable que si la politique du réseau IoT l'autorise.
+#define NTP_SERVER_PRIMARY "pool.ntp.org"
+#define NTP_SERVER_SECONDARY "time.cloudflare.com"
+
+// Le flash peut perturber une photopériode sombre. Le laisser désactivé tant
+// que son usage n'a pas été validé dans l'espace de culture.
+#define CAMERA_FLASH_ENABLED false
+
+// Remplacer ce certificat factice par la CA qui signe le certificat HTTPS du
+// nom GATEWAY_HOST. Une CA publique n'est pas un secret et peut être versionnée
+// dans config.h local, mais jamais la clé privée correspondante.
+static constexpr char GATEWAY_ROOT_CA[] PROGMEM = R"CERT(
+-----BEGIN CERTIFICATE-----
+<CERTIFICAT_CA_DU_GATEWAY>
+-----END CERTIFICATE-----
+)CERT";

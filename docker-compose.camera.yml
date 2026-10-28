@@ -1,0 +1,35 @@
+name: gardenjournal-camera
+
+services:
+  camera-gateway:
+    build:
+      context: .
+      dockerfile: camera_gateway/Dockerfile
+    env_file:
+      - .env.camera
+    command:
+      - --host
+      - "0.0.0.0"
+      - --port
+      - "8443"
+      - --database
+      - /var/lib/gardenjournal-camera/camera.db
+      - --photos
+      - /var/lib/gardenjournal-camera/photos
+      - --certificate
+      - /run/gardenjournal-camera-tls/fullchain.pem
+      - --private-key
+      - /run/gardenjournal-camera-tls/privkey.pem
+    ports:
+      - "${CAMERA_GATEWAY_BIND_IP:-127.0.0.1}:8443:8443"
+    volumes:
+      - ${CAMERA_GATEWAY_DATA_DIR:-./camera_data}:/var/lib/gardenjournal-camera
+      - ${CAMERA_GATEWAY_TLS_DIR:-./camera_tls}:/run/gardenjournal-camera-tls:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    restart: unless-stopped

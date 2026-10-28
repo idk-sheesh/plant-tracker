@@ -1,0 +1,9 @@
+#pragma once
+
+// Create a local secrets.storage.h from this template and configure Wi-Fi locally.
+// Ce fichier exemple ne doit jamais contenir de vraies informations Wi-Fi.
+#define WIFI_SSID ""
+#define WIFI_PASSWORD ""
+
+// Le Raspberry Pi collecte les mesures sur le réseau local.
+#define GARDENJOURNAL_CLOUD_ENABLED 0

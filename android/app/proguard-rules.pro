@@ -1,0 +1,3 @@
+-keep class io.flutter.** { *; }
+-dontwarn kotlin.**
+-keep class com.signify.hue.** { *; }
